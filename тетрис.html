@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рулетка</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+        }
+
+        .banner {
+            position: absolute;
+            top: 0;
+            width: 600px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner.left {
+            left: 0;
+        }
+
+        .banner.right {
+            right: 0;
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid white;
+            background: conic-gradient(#ff0000 0% 10%, #00ff00 10% 20%, #0000ff 20% 30%, rgb(197, 5, 197) 30% 40%, rgb(26, 211, 224) 40% 50%, rgb(248, 0, 174) 50% 60%, #ffa500 60% 70%, #808080 70% 80%, #ff00ff 80% 90%, #800000 90% 100%);
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        .pointer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            width: 20px;
+            height: 20px;
+            background: red;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background: #4CAF50;
+            color: white;
+            transition: 0.3s;
+            margin-top: 20px;
+            z-index: 2;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #result-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #result {
+            font-size: 28px;
+            font-weight: bold;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        img {
+            margin-top: 10px;
+            width: 200px;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+
+        /* Стиль для поп-ап окна */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 9999;
+        }
+
+        .popup img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Медиазапросы для адаптивности */
+        @media (max-width: 768px) {
+            .banner {
+                width: 100%;
+                height: 50vh;
+            }
+
+            .wheel-container {
+                width: 200px;
+                height: 200px;
+            }
+
+            .wheel {
+                width: 100%;
+                height: 100%;
+            }
+
+            button {
+                font-size: 18px;
+                padding: 12px 24px;
+            }
+
+            #result {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner {
+                height: 30vh;
+            }
+
+            .wheel-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .wheel {
+                width: 100%;
+                height: 100%;
+            }
+
+            button {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+
+            #result {
+                font-size: 20px;
+            }
+
+            img {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+  
+    <h1>Рулетка</h1>
+    <div class="container">
+        <div class="wheel-container">
+            <div class="wheel" id="wheel"></div>
+            <div class="pointer"></div>
+        </div>
+    </div>
+    <button onclick="spinWheel()">Крутить</button>
+    <div id="result-container">
+        <div id="result"></div>
+        <img id="result-image" src="" alt="" style="display: none;">
+    </div>
+
+    <!-- Поп-ап реклама -->
+    <div class="popup" id="popup">
+        <h2>Нам нужен ваш деп</h2>
+        <img src="cringe.jpg" alt="Нам нужен ваш деп">
+        <br>
+        <button onclick="closePopup()">Закрыть</button>
+    </div>
+
+    <!-- Музыка с автозапуском кнопкой -->
+    <audio id="background-music" loop>
+        <source src="m.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает элемент audio.
+    </audio>
+    <button onclick="playMusic()">Нажмите, чтобы включить музыку</button>
+    <button onclick="pauseMusic()">Нажмите, чтобы выключить музыку</button>
+
+    <script>
+        function spinWheel() {
+            const options = [
+                { text: "Егор", img: "porno.jpg" },
+                { text: "Кринж", img: "R.jpg" },
+                { text: "Сурик", img: "Q.jpg" },
+                { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn8XCJkDj4kdvrDRYdy0UZGSSUBC3erUtKAQ&s" },
+                { text: "Курдюк", img: "W.jpg" },
+                { text: "Даник", img: "T.jpg" },
+                { text: "Лиза", img: "E.jpg" },
+                { text: "Lvinto", img: "L.jpg" },
+                { text: "БИБА", img: "P.jpg" },
+                { text: "Глеб", img: "K.jpg" },
+            ];
+            const wheel = document.getElementById("wheel");
+            const resultText = document.getElementById("result");
+            const resultImage = document.getElementById("result-image");
+
+            // Генерация случайного угла вращения
+            const randomIndex = Math.floor(Math.random() * options.length);
+            const selectedOption = options[randomIndex];
+
+            // Вращение колеса
+            const randomRotation = 360000 * (randomIndex * (360 / options.length));
+            wheel.style.transform = `rotate(${randomRotation}deg)`;
+
+            // Отображение результата после анимации
+            setTimeout(() => {
+                resultText.textContent = selectedOption.text;
+                resultImage.src = selectedOption.img;
+                resultImage.style.display = "block";
+            }, 3000); // Ожидание окончания анимации
+        }
+
+        // Показываем поп-ап через каждые 3 минуты (180000 миллисекунд)
+        setInterval(() => {
+            document.getElementById("popup").style.display = "block";
+        }, 100000); // Показываем поп-ап каждые 3 минуты
+
+        // Закрыть поп-ап окно
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        // Воспроизведение музыки
+        function playMusic() {
+            const audio = document.getElementById("background-music");
+            audio.play();  // Запускаем воспроизведение музыки
+        }
+
+        // Остановка музыки
+        function pauseMusic() {
+            const audio = document.getElementById("background-music");
+            audio.pause();  // Останавливаем музыку
+        }
+    </script>
+</body>
+</html>
