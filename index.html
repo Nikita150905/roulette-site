@@ -251,35 +251,41 @@
 
     <!-- Музыка с автозапуском кнопкой -->
     <audio id="background-music" loop>
-        <source src="m.mp3" type="audio/mpeg">
+        <source src="Q.mp3" type="audio/mpeg">
         Ваш браузер не поддерживает элемент audio.
     </audio>
+
     <button onclick="playMusic()">Нажмите, чтобы включить музыку</button>
     <button onclick="pauseMusic()">Нажмите, чтобы выключить музыку</button>
 
     <script>
+        let audio = new Audio();
+
         function spinWheel() { 
             const options = [
-                { text: "Егор", img: "porno.jpg" },
-                { text: "Кринж", img: "BB.jpg" },
-                { text: "Сурик", img: "Q.jpg" },
-                { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn8XCJkDj4kdvrDRYdy0UZGSSUBC3erUtKAQ&s" },
-                { text: "Курдюк", img: "W.jpg" },
-                { text: "Даник", img: "T.jpg" },
-                { text: "Лиза", img: "E.jpg" },
-                { text: "Lvinto", img: "L.jpg" },
-                { text: "ПИБА", img: "P.jpg" },
-                { text: "Глеб", img: "K.jpg" },
-                { text: "Макар", img: "BY.jpg" },
-                { text: "0_0", img: "ff.jpg" },
-                { text: "Cтэпан", img: "XBK.jpg" },
-                { text: "Берёзки", img: "DD.jpg" },
-                { text: "Сэргей", img: "C.jpg" },
-                { text: "ДЭБ", img: "qq.jpg" },
+                { text: "Егор", img: "porno.jpg", sound: "egor.mp3" },
+                { text: "Кринж", img: "BB.jpg", sound: "cringe.mp3" },
+                { text: "Сурик", img: "Q.jpg", sound: "surik.mp3" },
+                { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn8XCJkDj4kdvrDRYdy0UZGSSUBC3erUtKAQ&s", sound: "dim.mp3" },
+                { text: "Курдюк", img: "W.jpg", sound: "kur.mp3" },
+                { text: "Даник", img: "T.jpg", sound: "dan.mp3" },
+                { text: "Лиза", img: "E.jpg", sound: "liza.mp3" },
+                { text: "Lvinto", img: "L.jpg", sound: "L.mp3" },
+                { text: "ПИБА", img: "P.jpg", sound: "piba.mp3" },
+                { text: "Глеб", img: "K.jpg", sound: "gleb.mp3" },
+                { text: "Макар", img: "BY.jpg", sound: "makar.mp3" },
+                { text: "0_0", img: "ff.jpg", sound: "fil.mp3" },
+                { text: "Cтэпан", img: "XBK.jpg", sound: "step.mp3" },
+                { text: "Берёзки", img: "DD.jpg", sound: "berez.mp3" },
+                { text: "Сэргей", img: "C.jpg", sound: "ser.mp3" },
+                { text: "ДЭБ", img: "qq.jpg", sound: "bab.mp3" },
             ];
             const wheel = document.getElementById("wheel");
             const resultText = document.getElementById("result");
             const resultImage = document.getElementById("result-image");
+
+            
+            
 
             // Генерация случайного угла вращения
             const randomIndex = Math.floor(Math.random() * options.length);
@@ -294,6 +300,11 @@
                 resultText.textContent = selectedOption.text;
                 resultImage.src = selectedOption.img;
                 resultImage.style.display = "block";
+               
+                audio.pause();
+                audio.currentTime = 0;
+                audio = new Audio(selectedOption.sound);
+                audio.play();
             }, 3000); // Ожидание окончания анимации
         }
 
