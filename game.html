@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра 3 в ряд</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            width: 416px;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: lightblue;
+            cursor: pointer;
+            border: 1px solid #000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .cell img {
+            width: 100%;
+            height: 100%;
+        }
+        .selected {
+            border: 2px solid red;
+        }
+        .fall {
+            animation: fall 0.3s ease-in;
+        }
+        @keyframes fall {
+            from { transform: translateY(-50px); }
+            to { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Игра 3 в ряд</h1>
+    <p>Очки: <span id="score">0</span></p>
+    <div class="grid" id="grid"></div>
+    
+    <audio id="swapSound" src="swap.mp3"></audio>
+    <audio id="matchSound" src="match.mp3"></audio>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const scoreElement = document.getElementById('score');
+        const swapSound = document.getElementById('swapSound');
+        const matchSound = document.getElementById('matchSound');
+        const size = 8;
+        const images = ['leh.jpg', 'kur.jpg', 'krin.jpg', 'sur.png', 'bab.jpg'];
+        let cells = [];
+        let selectedCell = null;
+        let score = 0;
+
+        function createBoard() {
+            for (let i = 0; i < size * size; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                const img = document.createElement('img');
+                img.src = images[Math.floor(Math.random() * images.length)];
+                cell.appendChild(img);
+                cell.addEventListener('click', () => selectCell(cell));
+                grid.appendChild(cell);
+                cells.push(cell);
+            }
+        }
+
+        function selectCell(cell) {
+            if (selectedCell) {
+                swapCells(selectedCell, cell);
+                selectedCell.classList.remove('selected');
+                selectedCell = null;
+                swapSound.play();
+                setTimeout(checkMatches, 200);
+            } else {
+                selectedCell = cell;
+                cell.classList.add('selected');
+            }
+        }
+
+        function swapCells(cell1, cell2) {
+            let tempSrc = cell1.firstChild.src;
+            cell1.firstChild.src = cell2.firstChild.src;
+            cell2.firstChild.src = tempSrc;
+        }
+
+        function checkMatches() {
+            let toRemove = new Set();
+            
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size - 2; col++) {
+                    let index = row * size + col;
+                    if (cells[index].firstChild.src === cells[index + 1].firstChild.src &&
+                        cells[index].firstChild.src === cells[index + 2].firstChild.src) {
+                        toRemove.add(index);
+                        toRemove.add(index + 1);
+                        toRemove.add(index + 2);
+                    }
+                }
+            }
+            
+            for (let col = 0; col < size; col++) {
+                for (let row = 0; row < size - 2; row++) {
+                    let index = row * size + col;
+                    if (cells[index].firstChild.src === cells[index + size].firstChild.src &&
+                        cells[index].firstChild.src === cells[index + 2 * size].firstChild.src) {
+                        toRemove.add(index);
+                        toRemove.add(index + size);
+                        toRemove.add(index + 2 * size);
+                    }
+                }
+            }
+            
+            if (toRemove.size > 0) {
+                matchSound.play();
+            }
+            
+            toRemove.forEach(index => {
+                cells[index].firstChild.src = images[Math.floor(Math.random() * images.length)];
+                score += 10;
+            });
+            scoreElement.innerText = score;
+            setTimeout(dropTiles, 200);
+        }
+
+        function dropTiles() {
+            for (let col = 0; col < size; col++) {
+                for (let row = size - 1; row >= 0; row--) {
+                    let index = row * size + col;
+                    if (cells[index].firstChild.src === '') {
+                        for (let k = row; k > 0; k--) {
+                            cells[k * size + col].firstChild.src = cells[(k - 1) * size + col].firstChild.src;
+                            cells[k * size + col].classList.add('fall');
+                        }
+                        cells[col].firstChild.src = images[Math.floor(Math.random() * images.length)];
+                        cells[col].classList.add('fall');
+                    }
+                }
+            }
+            setTimeout(() => cells.forEach(cell => cell.classList.remove('fall')), 300);
+            setTimeout(checkMatches, 300);
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
