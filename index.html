@@ -63,7 +63,23 @@
             height: 100%;
             border-radius: 50%;
             border: 10px solid white;
-            background: conic-gradient(#ff0000 0% 10%, #00ff00 10% 20%, #0000ff 20% 30%, rgb(197, 5, 197) 30% 40%, rgb(26, 211, 224) 40% 50%, rgb(248, 0, 174) 50% 60%, #ffa500 60% 70%, #808080 70% 80%, #ff00ff 80% 90%, #800000 90% 100%);
+            background: conic-gradient(
+         #ff0000 0% 6.25%, 
+        #00ff00 6.25% 12.5%, 
+        #0000ff 12.5% 18.75%, 
+        #ffff00 18.75% 25%, 
+        #ff00ff 25% 31.25%, 
+        #00ffff 31.25% 37.5%, 
+        #ffa500 37.5% 43.75%, 
+        #800080 43.75% 50%, 
+        #008000 50% 56.25%, 
+        #ff4500 56.25% 62.5%, 
+        #1e90ff 62.5% 68.75%, 
+        #8b4513 68.75% 75%, 
+        #2e8b57 75% 81.25%, 
+        #dc143c 81.25% 87.5%, 
+        #000000 87.5% 93.75%, 
+        #ffffff 93.75% 100%);
             transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
         }
 
@@ -242,18 +258,24 @@
     <button onclick="pauseMusic()">Нажмите, чтобы выключить музыку</button>
 
     <script>
-        function spinWheel() {
+        function spinWheel() { 
             const options = [
                 { text: "Егор", img: "porno.jpg" },
-                { text: "Кринж", img: "R.jpg" },
+                { text: "Кринж", img: "BB.jpg" },
                 { text: "Сурик", img: "Q.jpg" },
                 { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn8XCJkDj4kdvrDRYdy0UZGSSUBC3erUtKAQ&s" },
                 { text: "Курдюк", img: "W.jpg" },
                 { text: "Даник", img: "T.jpg" },
                 { text: "Лиза", img: "E.jpg" },
                 { text: "Lvinto", img: "L.jpg" },
-                { text: "БИБА", img: "P.jpg" },
+                { text: "ПИБА", img: "P.jpg" },
                 { text: "Глеб", img: "K.jpg" },
+                { text: "Макар", img: "BY.jpg" },
+                { text: "0_0", img: "ff.jpg" },
+                { text: "Cтэпан", img: "XBK.jpg" },
+                { text: "Берёзки", img: "DD.jpg" },
+                { text: "Сэргей", img: "C.jpg" },
+                { text: "ДЭБ", img: "qq.jpg" },
             ];
             const wheel = document.getElementById("wheel");
             const resultText = document.getElementById("result");
