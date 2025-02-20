@@ -260,7 +260,7 @@
     <button onclick="spinWheel()">Крутить</button>
     <div id="result-container">
         <div id="result"></div>
-        <img id="result-image" src="" alt="" style="display: none;">
+        <img onclick="replayMusic()" id="result-image" src="" alt="" style="display: none;">
     </div>
 
     <!-- Поп-ап реклама -->
@@ -300,7 +300,7 @@
                 { text: "Кринж", img: "BB.jpg", sound: "cringe.mp3" },
                 { text: "Сурик", img: "Q.jpg", sound: "surik.mp3" },
                 { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxlFCXTU1vPdkR0G7B_Ur8VRWUSg73w8cT9A&s", sound: "dim.mp3" },
-                { text: "Курдюк", img: "kur.jpg", sound: "kur.mp3" },
+                { text: "Курдюк", img: "W.jpg", sound: "kur.mp3" },
                 { text: "Даник", img: "T.jpg", sound: "dan.mp3" },
                 { text: "Лиза", img: "E.jpg", sound: "liza.mp3" },
                 { text: "Lvinto", img: "L.jpg", sound: "L.mp3" },
@@ -361,6 +361,12 @@
         function playMusic() {
             const audio = document.getElementById("background-music");
             audio.play();  // Запускаем воспроизведение музыки
+        }
+
+        function replayMusic(){
+            audio.pause();
+            audio.currentTime = 0;
+            audio.play();
         }
 
         // Остановка музыки
