@@ -1,92 +1,108 @@
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>21 Очко</title>
-        <style>
-            body { font-family: Arial, sans-serif; text-align: center;  background-image: url('fon.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: white;}
-            #game { margin-top: 20px; }
-            button { margin: 5px; padding: 10px; font-size: 16px; }
-            .cards { margin-top: 10px; }
-            .card img { width: 80px; height: auto; margin: 5px; }
-        </style>
-    </head>
-    <body>
-        <h1>Игра 21 Очко</h1>
-        <div id="game">
-            <p id="player-score">Ваши очки: 0</p>
-            <div id="player-cards" class="cards"></div>
-            <p id="dealer-score">Очки дилера: 0</p>
-            <div id="dealer-cards" class="cards"></div>
-            <button onclick="takeCard()">Взять карту</button>
-            <button onclick="stopGame()">Остановиться</button>
-            <p id="result"></p>
-        </div>
-        <script>
-            let playerScore = 0;
-            let dealerScore = 0;
-            let playerCards = [];
-            let dealerCards = [];
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>21 Очко</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-image: url('fon.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: white; }
+        #game { margin-top: 20px; }
+        button { margin: 5px; padding: 10px; font-size: 16px; }
+        .cards { margin-top: 10px; }
+        .card img { width: 80px; height: auto; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Игра 21 Очко</h1>
+    <div id="game">
+        <p id="player-score">Ваши очки: 0</p>
+        <div id="player-cards" class="cards"></div>
+        <p id="dealer-score">Очки дилера: 0</p>
+        <div id="dealer-cards" class="cards"></div>
+        <button onclick="takeCard()">Взять карту</button>
+        <button onclick="stopGame()">Остановиться</button>
+        <button id="restart-button" onclick="restartGame()" disabled>Начать заново</button>
+        <p id="result"></p>
+    </div>
+    <script>
+        let playerScore = 0;
+        let dealerScore = 0;
+        let playerCards = [];
+        let dealerCards = [];
 
-            function takeCard() {
-                let card = Math.floor(Math.random() * 13) + 1;
-                playerScore += card;
-                playerCards.push(card);
-                updateCards("player-cards", playerCards);
-                document.getElementById("player-score").textContent = "Ваши очки: " + playerScore;
-                if (playerScore > 21) {
-                    document.getElementById("result").textContent = "Вы проиграли!";
-                    disableButtons();
-                }
-                card = Math.floor(Math.random() * 11) + 1;
-                dealerScore += card;
-                dealerCards.push(card);
-
-                updateCards("dealer-cards", dealerCards);
-                document.getElementById("dealer-score").textContent = "Очки дилера: " + dealerScore;
-
-                if (playerScore > 21 && dealerScore <= 21) {
-                    document.getElementById("result").textContent = "Вы проиграли!";
-                    disableButtons();
-                } 
-                if (dealerScore > 21 && playerScore <= 21) {
-                    document.getElementById("result").textContent = "Вы выиграли!";
-                    disableButtons();
-                }
-            }
-
-            function stopGame() {
-                while (dealerScore < 17) {
-                    let card = Math.floor(Math.random() * 11) + 1;
-                    dealerScore += card;
-                    dealerCards.push(card);
-                }
-                updateCards("dealer-cards", dealerCards);
-                document.getElementById("dealer-score").textContent = "Очки дилера: " + dealerScore;
-                if (playerScore > 21 || (dealerScore >= playerScore && dealerScore <= 21)) {
-                    document.getElementById("result").textContent = "Вы проиграли!";
-                } else {
-                    document.getElementById("result").textContent = "Вы выиграли!";
-                }
+        function takeCard() {
+            let card = Math.floor(Math.random() * 13) + 1;
+            playerScore += card;
+            playerCards.push(card);
+            updateCards("player-cards", playerCards);
+            document.getElementById("player-score").textContent = "Ваши очки: " + playerScore;
+            if (playerScore > 21) {
+                document.getElementById("result").textContent = "Вы проиграли!";
                 disableButtons();
             }
+            card = Math.floor(Math.random() * 11) + 1;
+            dealerScore += card;
+            dealerCards.push(card);
 
-            function updateCards(elementId, cards) {
-                let container = document.getElementById(elementId);
-                container.innerHTML = "";
-                cards.forEach(card => {
-                    let cardElem = document.createElement("img");
-                    let mast = Math.floor(Math.random() * 3);
-                    cardElem.src = `card_${mast}${card}.png`;
-                    cardElem.alt = `Карта ${mast}${card}`;
-                    container.appendChild(cardElem);
-                });
-            }
+            updateCards("dealer-cards", dealerCards);
+            document.getElementById("dealer-score").textContent = "Очки дилера: " + dealerScore;
 
-            function disableButtons() {
-                document.querySelectorAll("button").forEach(button => button.disabled = true);
+            if (playerScore > 21 && dealerScore <= 21) {
+                document.getElementById("result").textContent = "Вы проиграли!";
+                disableButtons();
+            } 
+            if (dealerScore > 21 && playerScore <= 21) {
+                document.getElementById("result").textContent = "Вы выиграли!";
+                disableButtons();
             }
-        </script>
-    </body>
-    </html>
+        }
+
+        function stopGame() {
+            while (dealerScore < 17) {
+                let card = Math.floor(Math.random() * 11) + 1;
+                dealerScore += card;
+                dealerCards.push(card);
+            }
+            updateCards("dealer-cards", dealerCards);
+            document.getElementById("dealer-score").textContent = "Очки дилера: " + dealerScore;
+            if (playerScore > 21 || (dealerScore >= playerScore && dealerScore <= 21)) {
+                document.getElementById("result").textContent = "Вы проиграли!";
+            } else {
+                document.getElementById("result").textContent = "Вы выиграли!";
+            }
+            disableButtons();
+        }
+
+        function updateCards(elementId, cards) {
+            let container = document.getElementById(elementId);
+            container.innerHTML = "";
+            cards.forEach(card => {
+                let cardElem = document.createElement("img");
+                let mast = Math.floor(Math.random() * 3);
+                cardElem.src = `card_${mast}${card}.png`;
+                cardElem.alt = `Карта ${mast}${card}`;
+                container.appendChild(cardElem);
+            });
+        }
+
+        function disableButtons() {
+            document.querySelectorAll("button:not(#restart-button)").forEach(button => button.disabled = true);
+            document.getElementById("restart-button").disabled = false;
+        }
+
+        function restartGame() {
+            playerScore = 0;
+            dealerScore = 0;
+            playerCards = [];
+            dealerCards = [];
+            document.getElementById("player-score").textContent = "Ваши очки: 0";
+            document.getElementById("dealer-score").textContent = "Очки дилера: 0";
+            document.getElementById("player-cards").innerHTML = "";
+            document.getElementById("dealer-cards").innerHTML = "";
+            document.getElementById("result").textContent = "";
+            document.querySelectorAll("button").forEach(button => button.disabled = false);
+            document.getElementById("restart-button").disabled = true;
+        }
+    </script>
+</body>
+</html>
