@@ -25,12 +25,18 @@
         let birdImg = new Image();
         
         let imagesLoaded = 0;
+        let gameStarted = false;
+
         function onImageLoad() {
             imagesLoaded++;
             if (imagesLoaded === 2) {
                 canvas.width = bgImg.width;
                 canvas.height = bgImg.height;
-                gameLoop();
+                drawBackground();
+                drawBird();
+                ctx.fillStyle = "black";
+                ctx.font = "20px Arial";
+                ctx.fillText("Нажмите, чтобы начать", canvas.width / 2 - 80, canvas.height / 2);
             }
         }
 
@@ -121,9 +127,16 @@
             score = 0;
             frame = 0;
             gameRunning = true;
+            gameStarted = false;
+            drawBackground();
+            drawBird();
+            ctx.fillStyle = "black";
+            ctx.font = "20px Arial";
+            ctx.fillText("Нажмите, чтобы начать", canvas.width / 2 - 80, canvas.height / 2);
         }
         
         function gameLoop() {
+            if (!gameStarted) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBackground();
             drawBird();
@@ -141,7 +154,16 @@
             requestAnimationFrame(gameLoop);
         }
         
-        document.addEventListener("keydown", () => bird.velocity = bird.lift);
+        function startGame() {
+            if (!gameStarted) {
+                gameStarted = true;
+                gameLoop();
+            }
+            bird.velocity = bird.lift;
+        }
+
+        document.addEventListener("keydown", startGame);
+        document.addEventListener("mousedown", startGame);
     </script>
 </body>
 </html>
