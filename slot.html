@@ -46,10 +46,13 @@
     </div>
 
     <audio id="backgroundMusic" loop>
-        <source src="music.mp3" type="audio/mpeg">
+        <source src="background.mp3" type="audio/mpeg">
     </audio>
     <audio id="spinSound">
         <source src="spin.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="winSound">
+        <source src="win.mp3" type="audio/mpeg">
     </audio>
     <button onclick="toggleMusic()">🎵 Вкл/Выкл музыку</button>
 
@@ -60,6 +63,7 @@
         let musicPlaying = false;
         const backgroundMusic = document.getElementById("backgroundMusic");
         const spinSound = document.getElementById("spinSound");
+        const winSound = document.getElementById("winSound");
 
         function toggleMusic() {
             if (musicPlaying) {
@@ -109,6 +113,7 @@
                 let winnings = 0;
                 if (val1 === val2 && val2 === val3) {
                     winnings = val1 === "🔔" ? 150 : val1 === "⭐" ? 100 : 50;
+                    winSound.play(); // Звук при выигрыше
                 } else if (val1 === val2 && val3 === "⭐") {
                     winnings = 20;
                 } else if (val1 === val2 && val3 === "🔔") {
