@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Слот-машина</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .slot-container { display: flex; justify-content: center; margin: 20px; }
+        .slot { width: 80px; height: 80px; border: 2px solid black; font-size: 2em; display: flex; justify-content: center; align-items: center; margin: 5px; background: #fff; transition: transform 0.5s ease-in-out; }
+        .spin-button, .deposit-button, button { font-size: 1.2em; padding: 10px; margin-top: 20px; cursor: pointer; background-color: green; color: white; border: none; border-radius: 5px; }
+        .spin-button:hover, .deposit-button:hover, button:hover { background-color: darkgreen; }
+        .result { margin-top: 20px; font-size: 1.5em; }
+        .balance { font-size: 1.2em; margin-bottom: 10px; }
+        .deposit-container { margin-top: 20px; }
+        .winning-combinations { margin-top: 20px; }
+        .winning-combinations img { width: 200px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Слот-машина</h1>
+    <div class="balance">Баланс: <span id="balance">100</span> монет</div>
+    <div class="slot-container">
+        <div class="slot" id="slot1">🎰</div>
+        <div class="slot" id="slot2">🎰</div>
+        <div class="slot" id="slot3">🎰</div>
+    </div>
+    <button class="spin-button" onclick="spin()">Крутить (ставка: 10 монет)</button>
+    <div class="result" id="result"></div>
+    <div class="bonus-spins">Бесплатные вращения: <span id="freeSpins">0</span></div>
+    
+    <div class="deposit-container">
+        <input type="number" id="depositAmount" placeholder="Введите сумму" min="1" max="100">
+        <button class="deposit-button" onclick="deposit()">Пополнить баланс</button>
+    </div>
+
+    <div class="winning-combinations">
+        <h2>Выигрышные комбинации</h2>
+        <p>🍒🍒🍒 – 50 монет</p>
+        <p>🍋🍋🍋 – 50 монет</p>
+        <p>🍉🍉🍉 – 50 монет</p>
+        <p>⭐⭐⭐ – 100 монет</p>
+        <p>🔔🔔🔔 – 150 монет</p>
+        <p>⭐⭐🔔 – 30 монет</p>
+        <p>🍒🍒⭐ – 20 монет</p>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="background.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="spinSound">
+        <source src="spin.mp3" type="audio/mpeg">
+    </audio>
+    <button onclick="toggleMusic()">🎵 Вкл/Выкл музыку</button>
+
+    <script>
+        const symbols = ["🍒", "🍋", "🍉", "⭐", "🔔"];
+        let balance = 100;
+        let freeSpins = 0;
+        let musicPlaying = false;
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        const spinSound = document.getElementById("spinSound");
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+            } else {
+                backgroundMusic.play();
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        function spin() {
+            if (freeSpins > 0) {
+                freeSpins--;
+                document.getElementById("freeSpins").textContent = freeSpins;
+            } else {
+                if (balance < 10) {
+                    document.getElementById("result").textContent = "Недостаточно монет!";
+                    return;
+                }
+                balance -= 10;
+                document.getElementById("balance").textContent = balance;
+            }
+            spinSound.play();
+
+            let slot1 = document.getElementById("slot1");
+            let slot2 = document.getElementById("slot2");
+            let slot3 = document.getElementById("slot3");
+            let result = document.getElementById("result");
+
+            slot1.style.transform = "rotateX(360deg)";
+            slot2.style.transform = "rotateX(360deg)";
+            slot3.style.transform = "rotateX(360deg)";
+
+            setTimeout(() => {
+                let val1 = symbols[Math.floor(Math.random() * symbols.length)];
+                let val2 = symbols[Math.floor(Math.random() * symbols.length)];
+                let val3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+                slot1.textContent = val1;
+                slot2.textContent = val2;
+                slot3.textContent = val3;
+
+                slot1.style.transform = "rotateX(0deg)";
+                slot2.style.transform = "rotateX(0deg)";
+                slot3.style.transform = "rotateX(0deg)";
+
+                let winnings = 0;
+                if (val1 === val2 && val2 === val3) {
+                    winnings = val1 === "🔔" ? 150 : val1 === "⭐" ? 100 : 50;
+                } else if (val1 === val2 && val3 === "⭐") {
+                    winnings = 20;
+                } else if (val1 === val2 && val3 === "🔔") {
+                    winnings = 30;
+                }
+
+                if (winnings > 0) {
+                    balance += winnings;
+                    result.textContent = `Поздравляем! Вы выиграли ${winnings} монет! 🎉`;
+                } else {
+                    result.textContent = "Попробуйте снова!";
+                }
+
+                if (Math.random() < 0.1) {
+                    let bonusSpins = Math.floor(Math.random() * 3) + 1;
+                    freeSpins += bonusSpins;
+                    document.getElementById("freeSpins").textContent = freeSpins;
+                    result.textContent += ` 🎁 Бонус! ${bonusSpins} бесплатных вращений!`;
+                }
+                
+                document.getElementById("balance").textContent = balance;
+            }, 500);
+        }
+    </script>
+</body>
+</html>
