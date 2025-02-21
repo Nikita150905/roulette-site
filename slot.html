@@ -46,7 +46,7 @@
     </div>
 
     <audio id="backgroundMusic" loop>
-        <source src="background.mp3" type="audio/mpeg">
+        <source src="music.mp3" type="audio/mpeg">
     </audio>
     <audio id="spinSound">
         <source src="spin.mp3" type="audio/mpeg">
@@ -131,6 +131,18 @@
                 
                 document.getElementById("balance").textContent = balance;
             }, 500);
+        }
+
+        function deposit() {
+            const depositAmount = parseInt(document.getElementById("depositAmount").value);
+            if (depositAmount > 0 && depositAmount <= 100) {
+                balance += depositAmount;
+                document.getElementById("balance").textContent = balance;
+                document.getElementById("depositAmount").value = '';
+                alert(`Баланс пополнен на ${depositAmount} монет.`);
+            } else {
+                alert('Введите корректную сумму для пополнения!');
+            }
         }
     </script>
 </body>
