@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тетрис</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background-color: black;
+            display: block;
+            margin: auto;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .controls button {
+            font-size: 20px;
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .music-controls {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тетрис</h1>
+    <h2>Счет: <span id="score">0</span></h2>
+    <canvas id="tetris" width="300" height="600"></canvas>
+    <div class="controls">
+        <button id="left">⬅️</button>
+        <button id="rotate">🔄</button>
+        <button id="right">➡️</button>
+        <button id="down">⬇️</button>
+    </div>
+
+    <!-- Контролы для музыки -->
+    <div class="music-controls">
+        <button id="music-toggle-on">Включить музыку</button>
+        <button id="music-toggle-off">Выключить музыку</button>
+    </div>
+
+    <!-- Добавляем фоновую музыку -->
+    <audio id="background-music" loop autoplay>
+        <source id="music-source" src="song1.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает элемент audio.
+    </audio>
+
+    <script>
+        const canvas = document.getElementById("tetris");
+        const context = canvas.getContext("2d");
+
+        const ROWS = 20;
+        const COLUMNS = 10;
+        const COLORS = [null, "red", "blue", "green", "yellow", "purple", "orange", "cyan", "pink", "lime"];
+        const BLOCK_SIZE = 30; // Размер каждой клетки
+        let score = 0;
+        let dropCounter = 0;
+        let lastTime = 0;
+        const dropInterval = 500;
+
+        // Массив песен для случайного выбора
+        const songs = [
+            "song1.mp3", // Замените на путь к вашему файлу
+            "song2.mp3", // Замените на путь к вашему файлу
+            "song3.mp3"  // Замените на путь к вашему файлу
+        ];
+
+        const audioElement = document.getElementById("background-music");
+        const musicSource = document.getElementById("music-source");
+
+        // Функция для смены песни случайным образом
+        function changeSong() {
+            const randomSong = songs[Math.floor(Math.random() * songs.length)];
+            musicSource.src = randomSong;
+            audioElement.load();
+            audioElement.play();
+        }
+
+        // Слушаем событие окончания текущей песни и меняем её
+        audioElement.addEventListener('ended', changeSong);
+
+        // Функции для управления музыкой
+        document.getElementById("music-toggle-on").addEventListener("click", function() {
+            audioElement.play();
+            this.style.display = "none"; // Скрываем кнопку включения
+            document.getElementById("music-toggle-off").style.display = "inline"; // Показываем кнопку выключения
+        });
+
+        document.getElementById("music-toggle-off").addEventListener("click", function() {
+            audioElement.pause();
+            this.style.display = "none"; // Скрываем кнопку выключения
+            document.getElementById("music-toggle-on").style.display = "inline"; // Показываем кнопку включения
+        });
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById("score").innerText = score;
+        }
+
+        function createMatrix(w, h) {
+            return Array.from({ length: h }, () => Array(w).fill(0));
+        }
+
+        function drawMatrix(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        context.fillStyle = COLORS[value]; // Используем цвет из массива COLORS
+                        context.fillRect((x + offset.x) * BLOCK_SIZE, (y + offset.y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                        context.strokeStyle = "black";
+                        context.strokeRect((x + offset.x) * BLOCK_SIZE, (y + offset.y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    }
+                });
+            });
+        }
+
+        function createPiece() {
+            const pieces = [
+                { shape: [[1, 1, 1], [0, 1, 0]], color: 1 },  // Красный
+                { shape: [[2, 2], [2, 2]], color: 2 },        // Синий
+                { shape: [[0, 3, 3], [3, 3, 0]], color: 3 },  // Зеленый
+                { shape: [[4, 4, 0], [0, 4, 4]], color: 4 },  // Желтый
+                { shape: [[5, 5, 5, 5]], color: 5 },          // Фиолетовый
+                { shape: [[0, 6, 0], [0, 6, 0], [6, 6, 0]], color: 6 }, // Оранжевый
+                { shape: [[0, 7, 0], [0, 7, 0], [0, 7, 7]], color: 7 } // Циан
+            ];
+            const randomPiece = pieces[Math.floor(Math.random() * pieces.length)];
+            return randomPiece;
+        }
+
+        function isValidMove(matrix, pos) {
+            // Проверяем, не выходит ли фигура за пределы игрового поля
+            for (let y = 0; y < matrix.length; y++) {
+                for (let x = 0; x < matrix[y].length; x++) {
+                    if (matrix[y][x]) {
+                        const newX = pos.x + x;
+                        const newY = pos.y + y;
+                        if (newX < 0 || newX >= COLUMNS || newY >= ROWS || board[newY] && board[newY][newX]) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        function moveDown() {
+            player.pos.y++;
+            if (!isValidMove(player.matrix, player.pos)) {
+                player.pos.y--;
+                merge();
+            }
+        }
+
+        function moveLeft() {
+            player.pos.x--;
+            if (!isValidMove(player.matrix, player.pos)) {
+                player.pos.x++;
+            }
+        }
+
+        function moveRight() {
+            player.pos.x++;
+            if (!isValidMove(player.matrix, player.pos)) {
+                player.pos.x--;
+            }
+        }
+
+        function merge() {
+            player.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        board[y + player.pos.y][x + player.pos.x] = value;
+                    }
+                });
+            });
+
+            // Удаляем полные ряды
+            const removedLines = removeFullLines();
+            updateScore(removedLines * 100); // Каждое удаление ряда даёт 100 очков
+            player.matrix = createPiece().shape;
+            player.pos = { x: 4, y: 0 };
+            if (!isValidMove(player.matrix, player.pos)) {
+                // Игра окончена
+                alert("Game Over!");
+                resetGame();
+            }
+        }
+
+        function removeFullLines() {
+            let linesRemoved = 0;
+            outer: for (let row = ROWS - 1; row >= 0; row--) {
+                if (board[row].every(cell => cell !== 0)) { // Если ряд заполнен
+                    board.splice(row, 1); // Удаляем ряд
+                    board.unshift(Array(COLUMNS).fill(0)); // Добавляем новый пустой ряд сверху
+                    linesRemoved++;
+                    row++; // Сдвигаем на одну строку, чтобы снова не проверять этот ряд
+                }
+            }
+            return linesRemoved;
+        }
+
+        function resetGame() {
+            board.length = 0;
+            player.pos = { x: 4, y: 0 };
+            player.matrix = createPiece().shape;
+        }
+
+        function rotate(matrix) {
+            const rotated = matrix[0].map((_, index) =>
+                matrix.map(row => row[index])
+            ).reverse();
+            return rotated;
+        }
+
+        function rotatePiece() {
+            const rotated = rotate(player.matrix);
+            const backupPos = { ...player.pos };
+
+            if (isValidMove(rotated, player.pos)) {
+                player.matrix = rotated;
+            } else {
+                // Пробуем сдвигать фигуру влево на одну клетку и затем проверять, можно ли повернуть фигуру
+                player.pos.x--;
+                if (isValidMove(rotated, player.pos)) {
+                    player.matrix = rotated;
+                } else {
+                    player.pos = backupPos; // Возвращаем исходную позицию, если вращение невозможно
+                }
+            }
+        }
+
+        const board = createMatrix(COLUMNS, ROWS);
+        const player = { pos: { x: 4, y: 0 }, matrix: createPiece().shape, color: createPiece().color };
+
+        function update(time = 0) {
+            const deltaTime = time - lastTime;
+            lastTime = time;
+            dropCounter += deltaTime;
+            if (dropCounter > dropInterval) {
+                moveDown();
+                dropCounter = 0;
+            }
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function draw() {
+            context.fillStyle = "black";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            drawMatrix(board, { x: 0, y: 0 });
+            drawMatrix(player.matrix, player.pos);
+        }
+
+        document.getElementById("left").addEventListener("click", moveLeft);
+        document.getElementById("right").addEventListener("click", moveRight);
+        document.getElementById("down").addEventListener("click", moveDown);
+        document.getElementById("rotate").addEventListener("click", rotatePiece);
+
+        update();
+    </script>
+</body>
+</html>
