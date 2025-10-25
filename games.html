@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Коллекция браузерных игр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .game-description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .game-difficulty {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
+
+        .easy {
+            background: rgba(46, 204, 113, 0.3);
+            border: 1px solid #2ecc71;
+        }
+
+        .medium {
+            background: rgba(241, 196, 15, 0.3);
+            border: 1px solid #f1c40f;
+        }
+
+        .hard {
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid #e74c3c;
+        }
+
+        .game-features {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .feature-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Коллекция игр</h1>
+            <p class="subtitle">Выберите игру и погрузитесь в мир развлечений!</p>
+        </header>
+
+        <div class="games-grid">
+            <!-- Космическая стрелялка -->
+            <a href="space.html" class="game-card">
+                <div class="game-icon">🚀</div>
+                <div class="game-title">Космическая стрелялка</div>
+                <div class="game-description">
+                    Управляйте космическим кораблем, уничтожайте врагов и избегайте столкновений. 
+                    Собирайте улучшения для усиления оружия!
+                </div>
+                <div class="game-difficulty medium">Средняя сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Экшен</span>
+                    <span class="feature-tag">Аркада</span>
+                    <span class="feature-tag">Космос</span>
+                </div>
+            </a>
+
+            <!-- Змейка -->
+            <a href="zmeika.html" class="game-card">
+                <div class="game-icon">🐍</div>
+                <div class="game-title">Классическая змейка</div>
+                <div class="game-description">
+                    Управляйте змейкой, собирайте еду и становитесь длиннее. 
+                    Избегайте столкновений со стенами и собственным хвостом!
+                </div>
+                <div class="game-difficulty easy">Легкая сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Классика</span>
+                    <span class="feature-tag">Головоломка</span>
+                    <span class="feature-tag">Ретро</span>
+                </div>
+            </a>
+
+            <!-- Гонки -->
+            <a href="car.html" class="game-card">
+                <div class="game-icon">🏎️</div>
+                <div class="game-title">Скоростные гонки</div>
+                <div class="game-description">
+                    Управляйте гоночным автомобилем на высокой скорости. 
+                    Обгоняйте соперников и избегайте столкновений!
+                </div>
+                <div class="game-difficulty hard">Высокая сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Гонки</span>
+                    <span class="feature-tag">Скорость</span>
+                    <span class="feature-tag">Авто</span>
+                </div>
+            </a>
+
+            <!-- Тетрис -->
+            <a href="tetris.html" class="game-card">
+                <div class="game-icon">🧩</div>
+                <div class="game-title">Тетрис</div>
+                <div class="game-description">
+                    Классическая головоломка. Расставляйте падающие фигурки, 
+                    заполняйте линии и не позволяйте блокам достигнуть верха!
+                </div>
+                <div class="game-difficulty medium">Средняя сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Головоломка</span>
+                    <span class="feature-tag">Классика</span>
+                    <span class="feature-tag">Стратегия</span>
+                </div>
+            </a>
+
+            <!-- Пазлы -->
+            <a href="game.html" class="game-card">
+                <div class="game-icon">🔍</div>
+                <div class="game-title">Собери пазл</div>
+                <div class="game-description">
+                    Перемещайте кусочки пазла, чтобы собрать целое изображение. 
+                    Развивайте логическое мышление и терпение!
+                </div>
+                <div class="game-difficulty easy">Легкая сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Пазл</span>
+                    <span class="feature-tag">Логика</span>
+                    <span class="feature-tag">Спокойствие</span>
+                </div>
+            </a>
+
+            <!-- Платформер -->
+            <a href="fb.html" class="game-card">
+                <div class="game-icon">🐦</div>
+                <div class="game-title">Flappy bird</div>
+                <div class="game-description">
+                    Проходите сковозь препятствия и ставьте рекорды
+                </div>
+                <div class="game-difficulty medium">Средняя сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Прыжки</span>
+                </div>
+            </a>
+
+             <a href="bb.html" class="game-card">
+                <div class="game-icon">♠️</div>
+                <div class="game-title">21 очко</div>
+                <div class="game-description">
+                    обыграйте соперника набрав 21 очко либо больше чем соперник
+                </div>
+                <div class="game-difficulty medium">Средняя сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">карты</span>
+                </div>
+            </a>
+
+            <a href="slot.html" class="game-card">
+                <div class="game-icon">🎲</div>
+                <div class="game-title">Однорукий бандит</div>
+                <div class="game-description">
+                    все зависит только от вашего везения
+                </div>
+                <div class="game-difficulty hard">Высокая сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">казино</span>
+                    <span class="feature-tag">везение</span>
+                </div>
+            </a>
+
+            <a href="dudle.html" class="game-card">
+                <div class="game-icon">🦺</div>
+                <div class="game-title">Майнер</div>
+                <div class="game-description">
+                    Лагает капец
+                </div>
+                <div class="game-difficulty hard">Высокая сложность</div>
+                <div class="game-features">
+                    <span class="feature-tag">Платформер</span>
+                    <span class="feature-tag">Мастерство</span>
+                </div>
+            </a>
+        </div>
+
+        
+    </div>
+</body>
+</html>
