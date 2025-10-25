@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Космическая стрелялка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 3px solid #4a00e0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(74, 0, 224, 0.5);
+        }
+        
+        #game-canvas {
+            background: #000;
+            display: block;
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        
+        .stat {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #4a00e0;
+        }
+        
+        #screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #8e2de2;
+            text-shadow: 0 0 10px #8e2de2;
+        }
+        
+        h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #8e2de2;
+            text-shadow: 0 0 10px #8e2de2;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #8e2de2, #4a00e0);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(142, 45, 226, 0.5);
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(142, 45, 226, 0.8);
+        }
+        
+        #controls {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #4a00e0;
+        }
+        
+        #upgrade-notification {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(74, 0, 224, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        #downgrade-notification {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        #life-loss-notification {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 100, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        #boss-health {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 25px;
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            overflow: hidden;
+            display: none;
+        }
+        
+        #boss-health-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6b6b);
+            transition: width 0.3s;
+        }
+        
+        #boss-name {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff0000;
+            font-size: 24px;
+            text-shadow: 0 0 10px #ff0000;
+            display: none;
+        }
+        
+        #music-control {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #4a00e0;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 5;
+            font-size: 20px;
+        }
+        
+        .powerup {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .explosion {
+            animation: explode 0.5s forwards;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        #loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        #loading-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        #loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #8e2de2, #4a00e0);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        
+        <div id="ui-overlay">
+            <div class="stat">Очки: <span id="score">0</span></div>
+            <div class="stat">Уровень: <span id="level">1</span></div>
+            <div class="stat">Жизни: <span id="lives">3</span></div>
+            <div class="stat">Оружие: <span id="weapon">Обычное</span></div>
+            <div class="stat">Пропущено: <span id="enemies-passed">0/3</span></div>
+        </div>
+        
+        <div id="boss-health">
+            <div id="boss-health-bar"></div>
+        </div>
+        <div id="boss-name">МЕГА-БОСС</div>
+        
+        <div id="upgrade-notification">УЛУЧШЕНИЕ ОРУЖИЯ!</div>
+        <div id="downgrade-notification">ПОТЕРЯ УРОВНЯ ОРУЖИЯ!</div>
+        <div id="life-loss-notification">ПОТЕРЯ ЖИЗНИ!</div>
+        
+        <div id="music-control">🔊</div>
+        
+        <div id="loading-screen">
+            <h2>ЗАГРУЗКА АУДИО...</h2>
+            <div id="loading-bar">
+                <div id="loading-progress"></div>
+            </div>
+            <p id="loading-text">Подготовка звуков: 0/3</p>
+        </div>
+        
+        <div id="screen">
+            <h1>КОСМИЧЕСКАЯ СТРЕЛЯЛКА</h1>
+            <div id="controls">
+                <p>Управление: ← → для движения, ПРОБЕЛ для стрельбы</p>
+                <p>Соберите улучшения для усиления оружия!</p>
+                <p>Враги отнимают уровень оружия при столкновении!</p>
+                <p>Каждые 3 пропущенных врага отнимают 1 жизнь!</p>
+            </div>
+            <button id="start-button">НАЧАТЬ ИГРУ</button>
+        </div>
+    </div>
+
+    <!-- Аудио элементы -->
+    <audio id="background-music" loop preload="auto">
+        <source src="trava.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="shoot-sound" preload="auto">
+        <source src="piu.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="boss-sound" preload="auto">
+        <source src="trev.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Получаем элементы DOM
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const screen = document.getElementById('screen');
+        const startButton = document.getElementById('start-button');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const livesElement = document.getElementById('lives');
+        const weaponElement = document.getElementById('weapon');
+        const enemiesPassedElement = document.getElementById('enemies-passed');
+        const upgradeNotification = document.getElementById('upgrade-notification');
+        const downgradeNotification = document.getElementById('downgrade-notification');
+        const lifeLossNotification = document.getElementById('life-loss-notification');
+        const bossHealth = document.getElementById('boss-health');
+        const bossHealthBar = document.getElementById('boss-health-bar');
+        const bossName = document.getElementById('boss-name');
+        const musicControl = document.getElementById('music-control');
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingProgress = document.getElementById('loading-progress');
+        const loadingText = document.getElementById('loading-text');
+
+        // Аудио элементы
+        const backgroundMusic = document.getElementById('background-music');
+        const shootSound = document.getElementById('shoot-sound');
+        const bossSound = document.getElementById('boss-sound');
+
+        // Игровые переменные
+        let gameActive = false;
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let weaponLevel = 1;
+        let bossActive = false;
+        let bossHealthValue = 300;
+        let powerupsCollectedThisLevel = 0;
+        let maxPowerupsPerLevel = 3;
+        let musicEnabled = true;
+        let enemiesPassedCount = 0;
+        const enemiesPerLifeLoss = 3;
+        let audioLoaded = false;
+        let audioLoadAttempts = 0;
+        const maxAudioLoadAttempts = 3;
+
+        // Игровые объекты
+        const player = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 80,
+            width: 50,
+            height: 70,
+            speed: 7,
+            color: '#4a00e0'
+        };
+
+        let bullets = [];
+        let enemies = [];
+        let powerups = [];
+        let particles = [];
+        let boss = null;
+        let bossBullets = [];
+
+        // Управление
+        const keys = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            Space: false
+        };
+
+        // Функция загрузки аудио
+        function loadAudio() {
+            const audioElements = [backgroundMusic, shootSound, bossSound];
+            let loadedCount = 0;
+            
+            audioElements.forEach((audio, index) => {
+                // Сбрасываем текущее время
+                audio.currentTime = 0;
+                
+                // Пытаемся загрузить аудио
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // Аудио успешно воспроизведено (загружено)
+                        audio.pause();
+                        audio.currentTime = 0;
+                        loadedCount++;
+                        updateLoadingProgress(loadedCount, audioElements.length);
+                        
+                        if (loadedCount === audioElements.length) {
+                            audioLoaded = true;
+                            loadingScreen.style.display = 'none';
+                            screen.style.display = 'flex';
+                        }
+                    }).catch(error => {
+                        console.log(`Аудио ${index + 1} не загружено:`, error);
+                        
+                        // Пытаемся загрузить снова
+                        setTimeout(() => {
+                            audioLoadAttempts++;
+                            if (audioLoadAttempts < maxAudioLoadAttempts) {
+                                loadAudio();
+                            } else {
+                                // Если не удалось загрузить, продолжаем без звука
+                                loadedCount++;
+                                updateLoadingProgress(loadedCount, audioElements.length);
+                                
+                                if (loadedCount === audioElements.length) {
+                                    audioLoaded = true;
+                                    loadingScreen.style.display = 'none';
+                                    screen.style.display = 'flex';
+                                    musicEnabled = false;
+                                    musicControl.textContent = '🔇';
+                                }
+                            }
+                        }, 1000);
+                    });
+                }
+            });
+        }
+
+        function updateLoadingProgress(loaded, total) {
+            const progress = (loaded / total) * 100;
+            loadingProgress.style.width = progress + '%';
+            loadingText.textContent = `Подготовка звуков: ${loaded}/${total}`;
+        }
+
+        // Обработчики событий
+        startButton.addEventListener('click', startGame);
+        musicControl.addEventListener('click', toggleMusic);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code in keys) {
+                keys[e.code] = true;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.code in keys) {
+                keys[e.code] = false;
+                e.preventDefault();
+            }
+        });
+
+        // Функция переключения музыки
+        function toggleMusic() {
+            if (!audioLoaded) return;
+            
+            if (musicEnabled) {
+                backgroundMusic.pause();
+                musicControl.textContent = '🔇';
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log("Не удалось воспроизвести музыку");
+                });
+                musicControl.textContent = '🔊';
+            }
+            musicEnabled = !musicEnabled;
+        }
+
+        // Начинаем загрузку аудио при загрузке страницы
+        window.addEventListener('load', function() {
+            loadAudio();
+        });
+
+        // Функция начала игры
+        function startGame() {
+            if (!audioLoaded) {
+                alert("Аудио еще загружается. Пожалуйста, подождите.");
+                return;
+            }
+            
+            gameActive = true;
+            screen.style.display = 'none';
+            score = 0;
+            level = 1;
+            lives = 3;
+            weaponLevel = 1;
+            bossActive = false;
+            powerupsCollectedThisLevel = 0;
+            enemiesPassedCount = 0;
+            
+            bullets = [];
+            enemies = [];
+            powerups = [];
+            particles = [];
+            boss = null;
+            bossBullets = [];
+            
+            // Запуск музыки при начале игры
+            if (musicEnabled) {
+                backgroundMusic.currentTime = 0;
+                backgroundMusic.play().catch(e => {
+                    console.log("Не удалось воспроизвести фоновую музыку");
+                });
+            }
+            
+            updateUI();
+            gameLoop();
+        }
+
+        // Игровой цикл
+        function gameLoop() {
+            if (!gameActive) return;
+            
+            update();
+            draw();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Обновление состояния игры
+        function update() {
+            // Движение игрока
+            if (keys.ArrowLeft && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys.ArrowRight && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+            
+            // Стрельба
+            if (keys.Space && Math.random() < 0.1) {
+                shoot();
+            }
+            
+            // Обновление пуль
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].y -= bullets[i].speed;
+                
+                // Удаление пуль за экраном
+                if (bullets[i].y < 0) {
+                    bullets.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновений с врагами
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    if (checkCollision(bullets[i], enemies[j])) {
+                        createExplosion(enemies[j].x + enemies[j].width/2, enemies[j].y + enemies[j].height/2);
+                        playSound(explosionSound);
+                        bullets.splice(i, 1);
+                        enemies.splice(j, 1);
+                        score += 10;
+                        updateUI();
+                        break;
+                    }
+                }
+                
+                // Проверка столкновений с боссом
+                if (boss && checkCollision(bullets[i], boss)) {
+                    bullets.splice(i, 1);
+                    bossHealthValue -= 2;
+                    bossHealthBar.style.width = (bossHealthValue / 300 * 100) + '%';
+                    
+                    if (bossHealthValue <= 0) {
+                        createExplosion(boss.x + boss.width/2, boss.y + boss.height/2, 50);
+                        playSound(explosionSound);
+                        boss = null;
+                        bossActive = false;
+                        bossHealth.style.display = 'none';
+                        bossName.style.display = 'none';
+                        score += 500;
+                        level++;
+                        powerupsCollectedThisLevel = 0;
+                        updateUI();
+                    }
+                    break;
+                }
+            }
+            
+            // Обновление врагов
+            if (Math.random() < 0.02 * level && enemies.length < 5 + level && !bossActive) {
+                createEnemy();
+            }
+            
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].y += enemies[i].speed;
+                
+                // Удаление врагов за экраном
+                if (enemies[i].y > canvas.height) {
+                    enemies.splice(i, 1);
+                    enemiesPassedCount++;
+                    updateUI();
+                    
+                    // Проверка, не пора ли отнять жизнь
+                    if (enemiesPassedCount >= enemiesPerLifeLoss) {
+                        loseLife();
+                        enemiesPassedCount = 0;
+                    }
+                    continue;
+                }
+                
+                // Проверка столкновений с игроком
+                if (checkCollision(player, enemies[i])) {
+                    createExplosion(enemies[i].x + enemies[i].width/2, enemies[i].y + enemies[i].height/2);
+                    playSound(explosionSound);
+                    enemies.splice(i, 1);
+                    
+                    // Столкновение с врагом - отнимаем уровень оружия И жизнь
+                    if (weaponLevel > 1) {
+                        weaponLevel--;
+                        showDowngradeNotification();
+                    }
+                    loseLife();
+                    updateUI();
+                }
+            }
+            
+            // Обновление улучшений
+            if (Math.random() < 0.005 && powerupsCollectedThisLevel < maxPowerupsPerLevel) {
+                createPowerup();
+            }
+            
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                powerups[i].y += powerups[i].speed;
+                
+                // Удаление улучшений за экраном
+                if (powerups[i].y > canvas.height) {
+                    powerups.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновений с игроком
+                if (checkCollision(player, powerups[i])) {
+                    if (weaponLevel < 5) {
+                        weaponLevel++;
+                        powerupsCollectedThisLevel++;
+                        showUpgradeNotification();
+                        playSound(powerupSound);
+                    }
+                    powerups.splice(i, 1);
+                    updateUI();
+                }
+            }
+            
+            // Обновление частиц
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].x += particles[i].vx;
+                particles[i].y += particles[i].vy;
+                particles[i].life--;
+                
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            // Обновление босса
+            if (boss) {
+                boss.x += boss.speed;
+                
+                if (boss.x <= 0 || boss.x >= canvas.width - boss.width) {
+                    boss.speed *= -1;
+                }
+                
+                // Стрельба босса
+                if (Math.random() < 0.03) {
+                    createBossBullet();
+                }
+            }
+            
+            // Обновление пуль босса
+            for (let i = bossBullets.length - 1; i >= 0; i--) {
+                bossBullets[i].y += bossBullets[i].speed;
+                
+                // Удаление пуль за экраном
+                if (bossBullets[i].y > canvas.height) {
+                    bossBullets.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновений с игроком
+                if (checkCollision(player, bossBullets[i])) {
+                    bossBullets.splice(i, 1);
+                    loseLife();
+                    updateUI();
+                }
+            }
+            
+            // Проверка появления босса
+            if (score > 0 && score % 1000 === 0 && !bossActive) {
+                spawnBoss();
+            }
+        }
+
+        // Отрисовка игры
+        function draw() {
+            // Очистка холста
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем звездное небо
+            drawStars();
+            
+            // Рисуем игрока
+            drawPlayer();
+            
+            // Рисуем пули
+            bullets.forEach(bullet => {
+                ctx.fillStyle = bullet.color;
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+            
+            // Рисуем врагов
+            enemies.forEach(enemy => {
+                ctx.fillStyle = enemy.color;
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                
+                // Рисуем "крылья" врага
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(enemy.x - 5, enemy.y + 10, 5, enemy.height - 20);
+                ctx.fillRect(enemy.x + enemy.width, enemy.y + 10, 5, enemy.height - 20);
+            });
+            
+            // Рисуем улучшения
+            powerups.forEach(powerup => {
+                ctx.fillStyle = powerup.color;
+                ctx.beginPath();
+                ctx.arc(powerup.x + powerup.width/2, powerup.y + powerup.height/2, powerup.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Рисуем частицы
+            particles.forEach(particle => {
+                ctx.fillStyle = particle.color;
+                ctx.globalAlpha = particle.life / 30;
+                ctx.fillRect(particle.x, particle.y, 3, 3);
+                ctx.globalAlpha = 1;
+            });
+            
+            // Рисуем босса
+            if (boss) {
+                ctx.fillStyle = boss.color;
+                ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+                
+                // Рисуем детали босса
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(boss.x + 10, boss.y + 10, boss.width - 20, 10);
+                ctx.fillRect(boss.x + 10, boss.y + boss.height - 20, boss.width - 20, 10);
+                
+                for (let i = 0; i < 5; i++) {
+                    ctx.fillRect(boss.x + 15 + i * 15, boss.y + 30, 10, 10);
+                }
+            }
+            
+            // Рисуем пули босса
+            bossBullets.forEach(bullet => {
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+        }
+
+        // Вспомогательные функции
+        function drawStars() {
+            ctx.fillStyle = 'white';
+            for (let i = 0; i < 100; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 2;
+                ctx.fillRect(x, y, size, size);
+            }
+        }
+
+        function drawPlayer() {
+            // Корпус корабля
+            ctx.fillStyle = player.color;
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width/2, player.y);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Двигатели
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(player.x + 10, player.y + player.height - 10, 10, 15);
+            ctx.fillRect(player.x + player.width - 20, player.y + player.height - 10, 10, 15);
+            
+            // Кабина
+            ctx.fillStyle = '#8e2de2';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width/2, player.y + 20, 10, 0, Math.PI, true);
+            ctx.fill();
+        }
+
+        function shoot() {
+            const bulletConfigs = {
+                1: { count: 1, offset: 0, color: '#00ffff' },
+                2: { count: 2, offset: 10, color: '#00ff00' },
+                3: { count: 3, offset: 15, color: '#ffff00' },
+                4: { count: 4, offset: 20, color: '#ff9900' },
+                5: { count: 5, offset: 25, color: '#ff0000' }
+            };
+            
+            const config = bulletConfigs[weaponLevel];
+            
+            for (let i = 0; i < config.count; i++) {
+                const offset = (i - (config.count - 1) / 2) * config.offset;
+                
+                bullets.push({
+                    x: player.x + player.width/2 - 2.5 + offset,
+                    y: player.y,
+                    width: 5,
+                    height: 15,
+                    speed: 10,
+                    color: config.color
+                });
+            }
+            
+            playSound(shootSound);
+        }
+
+        function createEnemy() {
+            const baseSpeed = 1.5;
+            const levelMultiplier = 0.3;
+            const randomVariation = 0.5;
+            
+            enemies.push({
+                x: Math.random() * (canvas.width - 40),
+                y: -40,
+                width: 40,
+                height: 40,
+                speed: baseSpeed + (Math.random() * randomVariation) + (level * levelMultiplier),
+                color: '#ff0000'
+            });
+        }
+
+        function createPowerup() {
+            powerups.push({
+                x: Math.random() * (canvas.width - 20),
+                y: -20,
+                width: 20,
+                height: 20,
+                speed: 3,
+                color: '#ffff00'
+            });
+        }
+
+        function createExplosion(x, y, count = 20) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    life: 30,
+                    color: ['#ff0000', '#ff9900', '#ffff00'][Math.floor(Math.random() * 3)]
+                });
+            }
+        }
+
+        function createBossBullet() {
+            if (!boss) return;
+            
+            bossBullets.push({
+                x: boss.x + boss.width/2 - 2.5,
+                y: boss.y + boss.height,
+                width: 5,
+                height: 15,
+                speed: 5,
+                color: '#ff0000'
+            });
+        }
+
+        function spawnBoss() {
+            bossActive = true;
+            bossHealthValue = 300;
+            bossHealth.style.display = 'block';
+            bossName.style.display = 'block';
+            bossHealthBar.style.width = '100%';
+            
+            playSound(bossSound);
+            
+            boss = {
+                x: canvas.width / 2 - 75,
+                y: 50,
+                width: 150,
+                height: 80,
+                speed: 2,
+                color: '#8b0000'
+            };
+        }
+
+        function loseLife() {
+            lives--;
+            showLifeLossNotification();
+            
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
+
+        function checkCollision(obj1, obj2) {
+            return obj1.x < obj2.x + obj2.width &&
+                   obj1.x + obj1.width > obj2.x &&
+                   obj1.y < obj2.y + obj2.height &&
+                   obj1.y + obj1.height > obj2.y;
+        }
+
+        function showUpgradeNotification() {
+            upgradeNotification.style.opacity = '1';
+            setTimeout(() => {
+                upgradeNotification.style.opacity = '0';
+            }, 2000);
+        }
+
+        function showDowngradeNotification() {
+            downgradeNotification.style.opacity = '1';
+            setTimeout(() => {
+                downgradeNotification.style.opacity = '0';
+            }, 2000);
+        }
+
+        function showLifeLossNotification() {
+            lifeLossNotification.style.opacity = '1';
+            setTimeout(() => {
+                lifeLossNotification.style.opacity = '0';
+            }, 2000);
+        }
+
+        function playSound(soundElement) {
+            if (!musicEnabled || !audioLoaded) return;
+            
+            try {
+                soundElement.currentTime = 0;
+                const playPromise = soundElement.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Не удалось воспроизвести звук:", error);
+                    });
+                }
+            } catch (error) {
+                console.log("Ошибка воспроизведения звука:", error);
+            }
+        }
+
+        function updateUI() {
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+            livesElement.textContent = lives;
+            enemiesPassedElement.textContent = `${enemiesPassedCount}/${enemiesPerLifeLoss}`;
+            
+            const weaponNames = {
+                1: 'Обычное',
+                2: 'Двойное',
+                3: 'Тройное',
+                4: 'Четверное',
+                5: 'МАКСИМАЛЬНОЕ'
+            };
+            
+            weaponElement.textContent = weaponNames[weaponLevel];
+        }
+
+        function gameOver() {
+            gameActive = false;
+            screen.style.display = 'flex';
+            screen.innerHTML = `
+                <h2>ИГРА ОКОНЧЕНА</h2>
+                <p>Ваш счет: ${score}</p>
+                <p>Достигнутый уровень: ${level}</p>
+                <button id="restart-button">ИГРАТЬ СНОВА</button>
+            `;
+            
+            document.getElementById('restart-button').addEventListener('click', startGame);
+        }
+
+        // Создаем заглушки для отсутствующих звуков
+        const explosionSound = document.createElement('audio');
+        const powerupSound = document.createElement('audio');
+        const lifeLostSound = document.createElement('audio');
+    </script>
+</body>
+</html>
