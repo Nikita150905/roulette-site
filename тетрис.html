@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рулетка</title>
     <style>
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -14,9 +19,9 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
+            width: 98vw;
+            height: 120vh;
+           
         }
 
         .container {
@@ -30,8 +35,8 @@
         .banner {
             position: absolute;
             top: 0;
-            width: 600px;
-            height: 100vh;
+            width: 65vh;
+            height: 95vh;
             background: rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
@@ -39,11 +44,11 @@
         }
 
         .banner.left {
-            left: 0;
+            left: 30px;
         }
 
         .banner.right {
-            right: 0;
+            right: 30px;
         }
 
         .banner img {
@@ -172,9 +177,17 @@
         /* Медиазапросы для адаптивности */
         @media (max-width: 768px) {
             .banner {
-                width: 100%;
-                height: 50vh;
+                width: 30vh;
+                height: 40vh;
+                bottom: 0px;
+                top: auto;
+            } .banner.left{
+                left: 5px;
             }
+            .banner.right{
+                right: 5px;
+            }
+
 
             .wheel-container {
                 width: 200px;
@@ -198,9 +211,17 @@
 
         @media (max-width: 480px) {
             .banner {
-                height: 30vh;
+                top: 0px;
+                width: 35%;
+                height: 25vh;
             }
-
+             .banner.left{
+                left: 0px;
+            }
+            .banner.right{
+                right: 0px;
+            }
+           
             .wheel-container {
                 width: 150px;
                 height: 150px;
@@ -227,8 +248,9 @@
     </style>
 </head>
 <body>
-  
-    <h1>Рулетка</h1>
+  <img src="2.jpg" class="banner left">
+  <img src="аа.jpg" class="banner right">
+  <h1>Рулетка</h1>
     <div class="container">
         <div class="wheel-container">
             <div class="wheel" id="wheel"></div>
@@ -238,7 +260,7 @@
     <button onclick="spinWheel()">Крутить</button>
     <div id="result-container">
         <div id="result"></div>
-        <img id="result-image" src="" alt="" style="display: none;">
+        <img onclick="replayMusic()" id="result-image" src="" alt="" style="display: none;">
     </div>
 
     <!-- Поп-ап реклама -->
@@ -251,35 +273,62 @@
 
     <!-- Музыка с автозапуском кнопкой -->
     <audio id="background-music" loop>
-        <source src="m.mp3" type="audio/mpeg">
+        <source src="Q.mp3" type="audio/mpeg">
         Ваш браузер не поддерживает элемент audio.
     </audio>
-    <button onclick="playMusic()">Нажмите, чтобы включить музыку</button>
+
+    <button onclick="playMusic()">Нажмите, чтобы включить музыку</button>  <button>  <a href="slot.html">Однорукий Бандит</a></button> 
     <button onclick="pauseMusic()">Нажмите, чтобы выключить музыку</button>
+    <button> <a href="game.html">Игра в думбус</a> </button> <button> <a href="tetris.html">Тетрис</a> </button>
+    <button>
+        <a href="bb.html">Игра в 21</a>
+    </button>
+    <button>
+        <a href="fb.html">Flappy bird</a>
+    </button>
+    <button>
+        <a href="space.html">бой в космосе</a>
+    </button>
+    <button>
+        <a href="car.html">гонки</a>
+    </button>
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/p-4Di0FrebI?si=7_z99SqQAk1gltsR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
     <script>
+        let audio = new Audio();
+
         function spinWheel() { 
             const options = [
-                { text: "Егор", img: "porno.jpg" },
-                { text: "Кринж", img: "BB.jpg" },
-                { text: "Сурик", img: "Q.jpg" },
-                { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn8XCJkDj4kdvrDRYdy0UZGSSUBC3erUtKAQ&s" },
-                { text: "Курдюк", img: "W.jpg" },
-                { text: "Даник", img: "T.jpg" },
-                { text: "Лиза", img: "E.jpg" },
-                { text: "Lvinto", img: "L.jpg" },
-                { text: "ПИБА", img: "P.jpg" },
-                { text: "Глеб", img: "K.jpg" },
-                { text: "Макар", img: "BY.jpg" },
-                { text: "0_0", img: "ff.jpg" },
-                { text: "Cтэпан", img: "XBK.jpg" },
-                { text: "Берёзки", img: "DD.jpg" },
-                { text: "Сэргей", img: "C.jpg" },
-                { text: "ДЭБ", img: "qq.jpg" },
+                { text: "Егор", img: "eg.jpg", sound: "egor.mp3" },
+                { text: "Кринж", img: "BB.jpg", sound: "cringe.mp3" },
+                { text: "Сурик", img: "Q.jpg", sound: "surik.mp3" },
+                { text: "Дима", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxlFCXTU1vPdkR0G7B_Ur8VRWUSg73w8cT9A&s", sound: "dim.mp3" },
+                { text: "Курдюк", img: "kur.jpg", sound: "kur.mp3" },
+                { text: "Даник", img: "T.jpg", sound: "dan.mp3" },
+                { text: "Лиза", img: "E.jpg", sound: "liza.mp3" },
+                { text: "Lvinto", img: "L.jpg", sound: "L.mp3" },
+                { text: "ПИБА", img: "P.jpg", sound: "piba.mp3" },
+                { text: "Глеб", img: "glebus.jpg", sound: "glebus.mp3" },
+                { text: "Макар", img: "BY.jpg", sound: "makar.mp3" },
+                { text: "0_0", img: "ff.jpg", sound: "fil.mp3" },
+                { text: "Cтэпан", img: "XBK.jpg", sound: "step.mp3" },
+                { text: "Берёзки", img: "DD.jpg", sound: "berez.mp3" },
+                { text: "Сэргей", img: "C.jpg", sound: "ser.mp3" },
+                { text: "ДЭБ", img: "qq.jpg", sound: "bab.mp3" },
+                { text: "Отец", img: "god.jpg", sound: "god.mp3" },
+                { text: "Кто это?", img: "beg.jpg", sound: "beg.mp3" },
+                { text: "Пабло Эскобар", img: "pavel.jpg", sound: "pavel.mp3" },
+                { text: "Быстро", img: "sax.jpg", sound: "sax.mp3" },
+                { text: "Были времена", img: "415.jpg", sound: "415.mp3" },
+                { text: "(～￣(OO)￣)ブ", img: "niki.jpg", sound: "niki.mp3" },
             ];
             const wheel = document.getElementById("wheel");
             const resultText = document.getElementById("result");
             const resultImage = document.getElementById("result-image");
+
+            
+            
 
             // Генерация случайного угла вращения
             const randomIndex = Math.floor(Math.random() * options.length);
@@ -294,13 +343,18 @@
                 resultText.textContent = selectedOption.text;
                 resultImage.src = selectedOption.img;
                 resultImage.style.display = "block";
+               
+                audio.pause();
+                audio.currentTime = 0;
+                audio = new Audio(selectedOption.sound);
+                audio.play();
             }, 3000); // Ожидание окончания анимации
         }
 
         // Показываем поп-ап через каждые 3 минуты (180000 миллисекунд)
         setInterval(() => {
             document.getElementById("popup").style.display = "block";
-        }, 100000); // Показываем поп-ап каждые 3 минуты
+        }, 180000); // Показываем поп-ап каждые 3 минуты
 
         // Закрыть поп-ап окно
         function closePopup() {
@@ -311,6 +365,12 @@
         function playMusic() {
             const audio = document.getElementById("background-music");
             audio.play();  // Запускаем воспроизведение музыки
+        }
+
+        function replayMusic(){
+            audio.pause();
+            audio.currentTime = 0;
+            audio.play();
         }
 
         // Остановка музыки
